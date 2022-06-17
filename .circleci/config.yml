@@ -6,7 +6,7 @@ orbs:
   # welcome: circleci/welcome-orb@0.4.1
   aws-cli: circleci/aws-cli@2.0.3
 
-jobs:
+job:
 
   create_infrastructure: 
     docker:
@@ -25,7 +25,7 @@ jobs:
       # - run: return 1
       - destroy_environment
 
-workflows:
+workflow:
   my_workflow:
-      jobs:
+      job:
         - create_infrastructure      
