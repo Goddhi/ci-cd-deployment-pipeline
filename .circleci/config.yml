@@ -8,7 +8,7 @@ orbs:
 
 jobs:
 
-  # create_infrastructure: 
+  # create_infrastructure: # A job that creates an infrastructure stack with an EC3 running in the stack
   #   docker:
   #     - image: amazon/aws-cli
   #   steps:
@@ -24,25 +24,44 @@ jobs:
       # Uncomment the line below if you want to fail the current step
       # - run: return 1
       
-  configure_infrastructure: 
+  # configure_infrastructure:   # A job that installs ansible on an EC2
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["15:80:c2:21:d0:9b:be:52:ea:d9:d1:81:15:2f:a4:94"] # You can get this ID in the section where you registered the SSH Key
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # install the dependencies needed for your playbook
+  #           apk add --update ansible 
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           ansible-playbook -i inventory main.yaml
+
+  smoke_test: # A smoke test that performs an error check if the website is running or not. if the website isnt runnning the pipeline fails
     docker:
-      - image: python:3.7-alpine3.11
+      - image: alpine:latest
     steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["15:80:c2:21:d0:9b:be:52:ea:d9:d1:81:15:2f:a4:94"] # You can get this ID in the section where you registered the SSH Key
+      - run: apk add --update curl
       - run:
-          name: Install dependencies
+          name: smoke test
           command: |
-            # install the dependencies needed for your playbook
-            apk add --update ansible 
-      - run:
-          name: Configure server
-          command: |
-            ansible-playbook -i inventory main.yaml
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
+      - destroy_environment            
 
 workflows:
   my_workflow:
       jobs:
        # - create_infrastructure
-         - configure_infrastructure      
+       # - configure_infrastructure 
+         - smoke_test     
