@@ -92,14 +92,21 @@ jobs:
     docker:
     - image: alpine:latest
     steps:
-      - run:
+      - run: 
           name: Test job
-       # Fail the job intentionally to simulate an error.
           command: |
             return 1
-      - destroy_environments # once the smoke_rollback_test job fails it runs this reference command to get the stack deleted
-        when: on_fail       
+      - destroy_enviroments
+        when: on_fail     
+      # - run:
+      #     name: Test job
+      #  # Fail the job intentionally to simulate an error.
+      #     command: |
+      #       return 1
+      # - destroy_environments # once the smoke_rollback_test job fails it runs this reference command to get the stack deleted
+      #   when: on_fail       
 
+  
 workflows:
   my_workflow:
       jobs:
