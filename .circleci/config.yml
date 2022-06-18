@@ -55,22 +55,22 @@ jobs:
   #           ansible-playbook -i inventory main.yaml
 
 
-  smoke_test: # A smoke test that performs an error check if the website is running or not. if the website isnt runnning the pipeline fails
-    docker:
-      - image: alpine:latest
-    steps:
-      - run: apk add --update curl
-      - run:
-          name: smoke test
-          command: |
-            URL="https://blog.udacity.com/"
-            # Test if website exists
-            if curl -s --head ${URL} 
-            then
-              return 0
-            else
-              return 1
-            fi
+  # smoke_test: # A smoke test that performs an error check if the website is running or not. if the website isnt runnning the pipeline fails
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run: apk add --update curl
+  #     - run:
+  #         name: smoke test
+  #         command: |
+  #           URL="https://blog.udacity.com/"
+  #           # Test if website exists
+  #           if curl -s --head ${URL} 
+  #           then
+  #             return 0
+  #           else
+  #             return 1
+  #           fi
 
 
 #  Creating a Rollback infrastructure that intentionally the stack fails
@@ -96,9 +96,9 @@ jobs:
           name: Test job
        # Fail the job intentionally to simulate an error.
           command:  return 1
-            - destroy_environment # once the smoke_rollback_test job fails it runs this reference command to get the stack deleted
+            - destroy_environments # once the smoke_rollback_test job fails it runs this reference command to get the stack deleted
           when: on_fail       
-              
+
 workflows:
   my_workflow:
       jobs:
