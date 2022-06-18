@@ -96,7 +96,7 @@ jobs:
           name: Test job
           command: |
             return 1
-      - destroy_enviroments
+      - destroy_environments
         when: on_fail     
       # - run:
       #     name: Test job
