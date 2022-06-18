@@ -21,7 +21,10 @@ commands: # command to roll back depployment once it fails
 
 jobs:
 
-  # create_infrastructure: # A job that creates an infrastructure stack with an EC3 running in the stack
+  # create_infra
+  
+  
+  #structure: # A job that creates an infrastructure stack with an EC3 running in the stack
   #   docker:
   #     - image: amazon/aws-cli
   #   steps:
@@ -74,29 +77,29 @@ jobs:
 
 
 #  Creating a Rollback infrastructure that intentionally the stack fails
-  create_rollback_infrastructure: 
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Create Cloudformation Stack
-          command: |
-            aws cloudformation deploy \
-            --template-file template.yml \
-            --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
-            --region us-east-1
+  # create_rollback_infrastructure: 
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Create Cloudformation Stack
+  #         command: |
+  #           aws cloudformation deploy \
+  #           --template-file template.yml \
+  #           --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7} \
+  #           --region us-east-1
 
-# Creatin a Smoke Test Job that intentionally fails to stimulate an error and get the created stack deleted
-  smoke_rollback_test:
-    docker:
-    - image: alpine:latest
-    steps:
-      - run: 
-          name: Test job
-          command: |
-            return 1
-      - destroy_environments
+# Creating a Smoke Test Job that intentionally fails to stimulate an error and get the created stack deleted
+  # smoke_rollback_test:
+  #   docker:
+  #   - image: alpine:latest
+  #   steps:
+  #     - run: 
+  #         name: Test job
+  #         command: |
+  #           return 1
+  #     - destroy_environments
         # when: on_fail     
       # - run:
       #     name: Test job
@@ -106,13 +109,30 @@ jobs:
       # - destroy_environments # once the smoke_rollback_test job fails it runs this reference command to get the stack deleted
       #   when: on_fail       
 
-  
+  create_and_deploy_front_end: # A job that deploy a bucket.yml file
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Execute bucket.yml - Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+            --template-file bucket.yml \
+            --region us-east-1 \
+            --stack-name stack-create-bucket-${CIRCLE_WORKFLOW_ID:0:7} \
+            --parameter-overrides MyBucketName="mybucket-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --profile projectUdacity \
+      # Uncomment the step below if yoou wish to upload all contents of the current directory to the S3 bucket
+      - run: aws s3 sync . s3://mybucket-${CIRCLE_WORKFLOW_ID:0:7} --delete
+
 workflows:
   my_workflow:
       jobs:
        # - create_infrastructure
        # - configure_infrastructure 
        # - smoke_test
-         - create_rollback_infrastructure
-         - smoke_rollback_test
+       # - create_rollback_infrastructure
+       # - smoke_rollback_test
+         - create_and_deploy_front_end
                 
