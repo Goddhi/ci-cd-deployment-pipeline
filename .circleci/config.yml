@@ -97,7 +97,7 @@ jobs:
           command: |
             return 1
       - destroy_environments
-        when: on_fail     
+        # when: on_fail     
       # - run:
       #     name: Test job
       #  # Fail the job intentionally to simulate an error.
